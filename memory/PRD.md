@@ -12,8 +12,9 @@ A voice-powered expense tracking mobile app with a Jarvis-style AI chatbot for f
 - **Audio**: expo-audio for recording
 
 ## Features
-1. **Google OAuth Login** - Secure authentication via Emergent Google Auth
-2. **Voice Input** - Record voice → AI extracts transactions with category, amount, date, description
+1. **Mobile OTP Login** (Primary) - Mock OTP shown on screen (works on Expo Go, Android & iOS)
+2. **Google OAuth Login** (Web only) - Secure authentication via Emergent Google Auth
+3. **Voice Input** - Record voice → AI extracts transactions with category, amount, date, description
 3. **Dashboard** - Balance overview, income/expense cards, category breakdown, recent transactions
 4. **Transaction CRUD** - Add, edit, delete transactions. Select any past date for missed entries
 5. **Jarvis AI Chatbot** - Context-aware financial assistant that knows user's spending data
