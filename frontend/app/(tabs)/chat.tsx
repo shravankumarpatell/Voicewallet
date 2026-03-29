@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, ActivityIndicator, KeyboardAvoidingView, Platform } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import { useAudioRecorder, AudioModule, RecordingPresets, setAudioModeAsync } from 'expo-audio';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { api } from '../../src/utils/api';
 
@@ -78,6 +78,7 @@ export default function Chat() {
       try {
         const perm = await AudioModule.requestRecordingPermissionsAsync();
         if (!perm.granted) return;
+        await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
         await audioRecorder.prepareToRecordAsync();
         audioRecorder.record();
         setIsRecording(true);

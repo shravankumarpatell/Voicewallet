@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Modal, Platform, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Modal, Platform, Alert, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { useAudioRecorder, AudioModule, RecordingPresets } from 'expo-audio';
+import { useAudioRecorder, AudioModule, RecordingPresets, setAudioModeAsync } from 'expo-audio';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { useAuth } from '../../src/contexts/AuthContext';
 import { api } from '../../src/utils/api';
@@ -34,18 +35,24 @@ export default function Dashboard() {
   const [voiceResult, setVoiceResult] = useState<any>(null);
   const [showVoice, setShowVoice] = useState(false);
   const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY);
+  const [refreshing, setRefreshing] = useState(false);
 
   const load = useCallback(async () => {
     try { setData(await api('/api/dashboard')); } catch (e) { console.error(e); }
     setLoading(false);
+    setRefreshing(false);
   }, []);
 
-  useEffect(() => { load(); }, []);
+  // Refresh data when tab comes into focus
+  useFocusEffect(useCallback(() => { load(); }, []));
+
+  const onRefresh = () => { setRefreshing(true); load(); };
 
   const startRec = async () => {
     try {
       const perm = await AudioModule.requestRecordingPermissionsAsync();
       if (!perm.granted) { Alert.alert('Permission needed', 'Microphone access required'); return; }
+      await setAudioModeAsync({ allowsRecording: true, playsInSilentMode: true });
       await audioRecorder.prepareToRecordAsync();
       audioRecorder.record();
       setIsRecording(true);
@@ -84,7 +91,8 @@ export default function Dashboard() {
 
   return (
     <View testID="dashboard-screen" style={[s.container, { backgroundColor: colors.background, paddingTop: insets.top }]}>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}>
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.scroll}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
         <View style={s.header}>
           <View>
             <Text style={[s.greeting, { color: colors.textSecondary }]}>Welcome back,</Text>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Modal, TextInput, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator, Modal, TextInput, Alert, KeyboardAvoidingView, Platform, RefreshControl } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useFocusEffect } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../src/contexts/ThemeContext';
 import { api } from '../../src/utils/api';
@@ -25,6 +26,7 @@ export default function Transactions() {
   const [year, setYear] = useState(now.getFullYear());
   const [txns, setTxns] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [showForm, setShowForm] = useState(false);
   const [editTxn, setEditTxn] = useState<any>(null);
   const [form, setForm] = useState({ amount: '', category: 'Food', description: '', date: '', type: 'expense' });
@@ -37,9 +39,13 @@ export default function Transactions() {
       setTxns(data);
     } catch (e) { console.error(e); }
     setLoading(false);
+    setRefreshing(false);
   }, [month, year]);
 
-  useEffect(() => { load(); }, [load]);
+  // Refresh when tab comes into focus
+  useFocusEffect(useCallback(() => { load(); }, [month, year]));
+
+  const onRefresh = () => { setRefreshing(true); load(); };
 
   const prevMonth = () => {
     if (month === 1) { setMonth(12); setYear(y => y - 1); }
@@ -108,7 +114,8 @@ export default function Transactions() {
       {loading ? (
         <View style={s.center}><ActivityIndicator size="large" color={colors.primary} /></View>
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.list}>
+        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={s.list}
+          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}>
           {txns.length === 0 ? (
             <Text style={[s.empty, { color: colors.textSecondary }]}>No transactions for {MONTHS[month-1]} {year}</Text>
           ) : txns.map((t, i) => {
