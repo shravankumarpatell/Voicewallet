@@ -2,7 +2,7 @@ from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, R
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import os, logging, json, uuid, httpx, tempfile
+import os, logging, json, uuid, httpx, tempfile, random
 from pathlib import Path
 from pydantic import BaseModel
 from typing import List, Optional
@@ -109,6 +109,58 @@ async def logout(request: Request):
     if auth.startswith("Bearer "):
         await db.user_sessions.delete_one({"session_token": auth.split(" ")[1]})
     return {"message": "Logged out"}
+
+# --- OTP Auth ---
+@api_router.post("/auth/send-otp")
+async def send_otp(request: Request):
+    body = await request.json()
+    mobile = body.get("mobile", "").strip()
+    if not mobile or len(mobile) < 10:
+        raise HTTPException(400, "Valid mobile number required")
+    otp = str(random.randint(100000, 999999))
+    await db.otp_codes.delete_many({"mobile": mobile})
+    await db.otp_codes.insert_one({
+        "mobile": mobile, "otp": otp,
+        "expires_at": datetime.now(timezone.utc) + timedelta(minutes=5),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    logger.info(f"Mock OTP for {mobile}: {otp}")
+    return {"message": f"OTP sent to {mobile}", "mock_otp": otp}
+
+@api_router.post("/auth/verify-otp")
+async def verify_otp(request: Request):
+    body = await request.json()
+    mobile = body.get("mobile", "").strip()
+    otp = body.get("otp", "").strip()
+    if not mobile or not otp:
+        raise HTTPException(400, "Mobile and OTP required")
+    stored = await db.otp_codes.find_one({"mobile": mobile, "otp": otp}, {"_id": 0})
+    if not stored:
+        raise HTTPException(401, "Invalid OTP")
+    expires_at = stored["expires_at"]
+    if isinstance(expires_at, str):
+        expires_at = datetime.fromisoformat(expires_at)
+    if expires_at.tzinfo is None:
+        expires_at = expires_at.replace(tzinfo=timezone.utc)
+    if expires_at < datetime.now(timezone.utc):
+        raise HTTPException(401, "OTP expired")
+    await db.otp_codes.delete_many({"mobile": mobile})
+    user = await db.users.find_one({"mobile": mobile}, {"_id": 0})
+    if not user:
+        user_id = f"user_{uuid.uuid4().hex[:12]}"
+        await db.users.insert_one({
+            "user_id": user_id, "mobile": mobile, "email": "",
+            "name": f"User {mobile[-4:]}", "picture": "",
+            "monthly_income": 0, "created_at": datetime.now(timezone.utc).isoformat()
+        })
+        user = await db.users.find_one({"user_id": user_id}, {"_id": 0})
+    session_token = f"session_{uuid.uuid4().hex}"
+    await db.user_sessions.insert_one({
+        "session_token": session_token, "user_id": user["user_id"],
+        "expires_at": datetime.now(timezone.utc) + timedelta(days=30),
+        "created_at": datetime.now(timezone.utc).isoformat()
+    })
+    return {"session_token": session_token, "user": user}
 
 # --- User ---
 @api_router.put("/user/income")
