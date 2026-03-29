@@ -1,0 +1,113 @@
+{
+  "theme": "dark_and_light",
+  "archetype": "5 (Jewel & Luxury with Tech Twist)",
+  "typography": {
+    "heading_font": "Outfit, sans-serif",
+    "body_font": "Work Sans, sans-serif",
+    "mono_font": "JetBrains Mono, monospace",
+    "scale": {
+      "h1": "text-4xl sm:text-5xl font-light tracking-tight",
+      "h2": "text-2xl sm:text-3xl font-normal tracking-tight",
+      "h3": "text-xl sm:text-2xl font-medium",
+      "body": "text-base leading-relaxed",
+      "small": "text-sm uppercase tracking-[0.2em]"
+    }
+  },
+  "colors": {
+    "dark": {
+      "background": "#09090B",
+      "surface": "#18181B",
+      "surface_elevated": "#27272A",
+      "text_primary": "#FAFAFA",
+      "text_secondary": "#A1A1AA",
+      "border": "#27272A",
+      "primary": "#FACC15",
+      "primary_foreground": "#09090B",
+      "income": "#34D399",
+      "expense": "#F87171",
+      "glass": "bg-zinc-950/60 backdrop-blur-2xl border-white/10"
+    },
+    "light": {
+      "background": "#FAFAFA",
+      "surface": "#FFFFFF",
+      "surface_elevated": "#F4F4F5",
+      "text_primary": "#09090B",
+      "text_secondary": "#71717A",
+      "border": "#E4E4E7",
+      "primary": "#09090B",
+      "primary_foreground": "#FAFAFA",
+      "income": "#10B981",
+      "expense": "#EF4444",
+      "glass": "bg-white/70 backdrop-blur-2xl border-black/5"
+    }
+  },
+  "spacing_and_layout": {
+    "container_padding": "p-6 md:p-8",
+    "gap_system": "gap-6 md:gap-8",
+    "bento_grid": "grid grid-cols-1 md:grid-cols-4 gap-6",
+    "card_radius": "rounded-3xl",
+    "button_radius": "rounded-full"
+  },
+  "components": {
+    "voice_input_button": {
+      "style": "floating, glassmorphic circle with a subtle glowing tracing beam edge",
+      "size": "w-20 h-20",
+      "position": "fixed bottom-8 left-1/2 -translate-x-1/2 z-50",
+      "animation": "pulse gently when inactive, waveform visualizer when active (listening)"
+    },
+    "dashboard_cards": {
+      "style": "neumorphic/clay crisp mix - flat background matching parent with a 1px border. No heavy drop shadows. Internal padding p-6",
+      "behavior": "hover:scale-[1.02] transition-transform duration-300"
+    },
+    "transaction_list": {
+      "style": "clean rows, icon on left inside a soft rounded-xl container, amount on right. Date picker above list.",
+      "divider": "1px solid border-border (only bottom of each row, last row no border)"
+    },
+    "jarvis_chat": {
+      "user_bubble": "bg-surface_elevated rounded-2xl rounded-tr-sm p-4 text-right",
+      "jarvis_bubble": "glassmorphic styling rounded-2xl rounded-tl-sm p-4 text-left border border-border/50",
+      "embedded_cards": "Jarvis can return interactive expense charts/cards inline"
+    }
+  },
+  "animations": {
+    "page_transition": "opacity and slight y-axis translation (fade up)",
+    "list_stagger": "staggerChildren 0.1s for transaction rows",
+    "micro_interactions": "buttons scale down 0.95 on active/press"
+  },
+  "media": {
+    "login_background": {
+      "url": "https://images.unsplash.com/photo-1760224254117-7a40f7f03fe2?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzV8MHwxfHNlYXJjaHwxfHxhYnN0cmFjdCUyMGRhcmslMjBsdXh1cnklMjB0ZXh0dXJlfGVufDB8fHx8MTc3NDgxMzMyNnww&ixlib=rb-4.1.0&q=85",
+      "description": "Abstract dark luxury texture for the Google Login screen background",
+      "overlay": "bg-black/60 (dark mode) or bg-white/40 (light mode) gradient overlay"
+    },
+    "default_avatar": {
+      "url": "https://images.pexels.com/photos/262391/pexels-photo-262391.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940",
+      "description": "Professional headshot for the user profile placeholder"
+    }
+  },
+  "icons": {
+    "library": "lucide-react",
+    "stroke_width": "1.5 for a sleek, lightweight feel",
+    "size": "w-5 h-5 for inline, w-8 h-8 for the main voice button"
+  },
+  "accessibility_and_testing": {
+    "test_ids": {
+      "voice_btn": "voice-input-button",
+      "google_login": "google-login-button",
+      "theme_toggle": "theme-toggle-button",
+      "transaction_item": "transaction-item-{id}",
+      "chat_input": "jarvis-chat-input"
+    },
+    "contrast": "Ensure text contrast over the login background. Use text shadows if necessary. Hover states must have higher contrast than default."
+  },
+  "instructions_to_main_agent": [
+    "This is a React Native Expo hybrid app, but use React Web patterns if running via Next.js for web (the problem statement says hybrid_fullstack). Translate these Tailwind directives appropriately for the platform.",
+    "Implement a Dark/Light mode toggle prominently. Default to Dark Mode.",
+    "Use Lucide icons for categories (e.g., Utensils for food, Car for transport).",
+    "Build the dashboard using a Bento grid style for desktop, stacking elegantly on mobile.",
+    "The Jarvis chatbot should feel conversational, answering queries like 'How much did I spend on food this month?' and rendering visual data (mini-charts) inline when appropriate.",
+    "Ensure the floating voice button is always accessible and has clear visual feedback when 'listening'.",
+    "DO NOT use Inter or standard fonts for headings. Use Outfit (or similar modern geometric) for headings and Work Sans for body.",
+    "No teal or purple-blue gradients allowed. Stick to the high-contrast yellow/black/white theme with emerald/red for financial metrics."
+  ]
+}
